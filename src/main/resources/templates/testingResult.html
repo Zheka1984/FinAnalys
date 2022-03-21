@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="http://techanjs.org/techan.min.js"></script>
+<script th:inline="javascript">
+let func = function(e, form) {
+    e.preventDefault();
+    var parseDate = d3.timeParse("%d-%m-%y"); 
+     fetch('/testing', {
+        method: "post", 
+        body: new FormData(form)
+    }).then(result => 
+    		d3.csv("http://localhost:8081/RTSI.csv", function (error, data) {
+                
+                let arr = data.map(function (d) {
+                	
+                    return {                	
+                        time: parseDate(d.time),
+                        type: +d.type,
+                        price: +d.price,
+                        quantity: +d.quantity,                       
+                    };
+                });
+                Object.values(arr).forEach(data => {temp = document.createElement('div');
+                temp.className = 'results';
+                temp.innerHTML = data;
+                document.getElementsByTagName('body')[0].appendChild(temp);
+				}
+				);
+			}
+)
+
+);
+}	
+</script>
+</head>
+<body>
+<p>Введите две переменные и условие входа</p>
+<form id="the-form" action="#" th:action="@{/testing}" th:object="${listwrapper}" method="post">
+<table>
+<button type="submit" name="addRow1" th:text="#{добавить строку}">Add row</button>
+<tr th:each="rawStrategy, itemStat : ${listwrapper.list1}">
+     <!-- <td><input th:field="*{list[__${itemStat.index}__].indicator1}" /></td>
+     <td><input th:field="*{list[__${itemStat.index}__].indicator2}" /></td> -->
+      <td><select size="3" th:field="*{list1[__${itemStat.index}__].indicator1}">
+    <option disabled value="Выберите индикатор1">Выберите индикатор1</option>
+    <option selected value="Exponential Moving Average">Moving Average</option>
+    <option value="MACD">MACD</option>
+   </select></td>
+   <td выберите временной период индикатора1>
+   <input type="number" th:field="*{list1[__${itemStat.index}__].period1}" th:name="period1"></td>
+   <td><select size="3" th:field="*{list1[__${itemStat.index}__].indicator2}">
+    <option disabled value="Выберите индикатор2">Выберите индикатор2</option>
+    <option selected value="Exponential Moving Average">Moving Average</option>
+    <option value="MACD">MACD</option>
+   </select></td>
+   <td выберите временной период индикатора2>
+   <input type="number" th:field="*{list1[__${itemStat.index}__].period2}" th:name="period2"></td>>
+   <td><select size="3" th:field="*{list1[__${itemStat.index}__].rule}">
+    <option disabled value="">Выберите правило открытия</option>
+    <option selected value="OverIndicatorRule">OverIndicatorRule</option>
+    <option value="CrossedDownIndicatorRule">CrossedDownIndicatorRule</option>
+   </select></td>
+</tr>
+<!-- <input type="submit" value="Accept"> -->
+</table>
+<p>Введите две переменные и условие выхода</p>
+<table>
+<button type="submit" name="addRow2" th:text="#{добавить строку}">Add row</button>
+<tr th:each="rawStrategy, itemStat : ${listwrapper.list2}">
+     <!-- <td><input th:field="*{list[__${itemStat.index}__].indicator1}" /></td>
+     <td><input th:field="*{list[__${itemStat.index}__].indicator2}" /></td> -->
+     <input type="hidden" th:field="*{list2[__${itemStat.index}__].period1}" th:value="listwrapper.list2.period1"></td>
+      <td><select size="3" th:field="*{list2[__${itemStat.index}__].indicator1}">
+    <option disabled value="Выберите индикатор1">Выберите индикатор1</option>
+    <option selected value="Exponential Moving Average">Moving Average</option>
+    <option value="MACD">MACD</option>
+   </select></td>
+   <td><select size="3" th:field="*{list2[__${itemStat.index}__].indicator2}">
+    <option disabled value="Выберите индикатор2">Выберите индикатор2</option>
+    <option selected value="Exponential Moving Average">Moving Average</option>
+    <option value="MACD">MACD</option>
+   </select></td>
+   <td><select size="3" th:field="*{list2[__${itemStat.index}__].rule}">
+    <option disabled value="">Выберите правило открытия</option>
+    <option selected value="OverIndicatorRule">OverIndicatorRule</option>
+    <option value="UnderIndicatorRule">UnderIndicatorRule</option>
+    <option value="CrossedDownIndicatorRule">CrossedDownIndicatorRule</option>
+   </select></td>
+</tr>
+<!-- <input type="submit" value="Accept"> -->
+</table>
+ <button onclick="func(event, form)">Click me</button> 
+</form>
+</body>
+
+</html>

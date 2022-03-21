@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>title</title>
+<style>
+
+    body {
+        font: 10px sans-serif;
+    }
+
+    .axis text {
+        font-size: 6px;
+    }
+
+    text.symbol {
+        fill: #BBBBBB;
+    }
+
+    path.candle {
+        stroke: #000000;
+    }
+
+    path.candle.body {
+        stroke-width: 0;
+    }
+
+    path.candle.up {
+        fill: #00AA00;
+        stroke: #00AA00;
+    }
+
+    path.candle.down {
+        fill: #FF0000;
+        stroke: #FF0000;
+    }
+
+    path.volume {
+        fill: #DDDDDD;
+    }
+
+    rect.pane {
+        cursor: move;
+        fill: none;
+        pointer-events: all;
+    }
+
+    .indicator path.line {
+        fill: none;
+        stroke-width: 1;
+    }
+
+    .ma-0 path.line {
+        stroke: #1f77b4;
+    }
+
+    .ma-1 path.line {
+        stroke: #aec7e8;
+    }
+
+    .ma-2 path.line {
+        stroke: #ff7f0e;
+    }
+
+    button {
+        position: absolute;
+        right: 110px;
+        top: 25px;
+    }
+/*     div.tooltip {	 */
+/*     position: absolute;			 */
+/*     text-align: center;			 */
+/*     width: auto;					 */
+/*     height: auto;					 */
+/*     padding: 2px;				 */
+/*     font: 12px sans-serif;		 */
+/*     background: rgba(0,0,0,0.8);	 */
+/*   	color: #fff; */
+/*     border: 0px;		 */
+/*     border-radius: 8px;			 */
+/*     pointer-events: none;			 */
+/* }   */
+
+</style>
+<script>
+    var shortEma = [[${shortEma}]];
+    var longEma = [[${longEma}]];
+</script>
+</head>
+<body>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="http://techanjs.org/techan.min.js"></script>
+<script>
+
+    function chart(name, symbol, fullWidth, fullHeight) {
+        var margin = {top: 20, right: 30, bottom: 30, left: 30},
+                width = fullWidth - margin.left - margin.right,
+                height = fullHeight - margin.top - margin.bottom,
+                volumeHeight = fullHeight*.25;
+
+     //   var parseDate = d3.timeParse("%d-%b-%y");
+        var parseDate = d3.timeParse("%d-%m-%y");
+
+        var zoom = d3.zoom()
+                .on("zoom", zoomed);
+
+        var x = techan.scale.financetime()
+                .range([0, width]);
+
+        var y = d3.scaleLinear()
+                .range([height, 0]);
+
+        var yPercent = y.copy();   // Same as y at this stage, will get a different domain later
+
+        var yVolume = d3.scaleLinear()
+                .range([height, height - volumeHeight]);
+
+        var yInit, yPercentInit, zoomableInit;
+
+        var candlestick = techan.plot.candlestick()
+                .xScale(x)
+                .yScale(y);
+
+        var ema1 = techan.plot.ema()
+                .xScale(x)
+                .yScale(y);
+
+        var ema2 = techan.plot.ema()
+                .xScale(x)
+                .yScale(y);
+
+        var volume = techan.plot.volume()
+                .accessor(candlestick.accessor())   // Set the accessor to a ohlc accessor so we get highlighted bars
+                .xScale(x)
+                .yScale(yVolume);
+
+        var xAxis = d3.axisBottom(x)
+                .ticks(4);
+
+        var yAxis = d3.axisRight(y)
+                .ticks(4)
+                .tickFormat(d3.format(",.6s"));
+
+        var percentAxis = d3.axisLeft(yPercent)
+                .ticks(4)
+                .tickFormat(d3.format('+.1%'));
+
+        var volumeAxis = d3.axisRight(yVolume)
+                .ticks(2)
+                .tickFormat(d3.format(",.6s"));
+
+        var svg = d3.select("body").append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        svg.append("clipPath")
+                .attr("id", "clip")
+                .append("rect")
+                .attr("x", 0)
+                .attr("y", y(1))
+                .attr("width", width)
+                .attr("height", y(0) - y(1));
+
+        svg.append('text')
+                .attr("class", "symbol")
+                .attr("x", 5)
+                .text(name + " (" + symbol + ")");
+
+        svg.append("g")
+                .attr("class", "volume")
+                .attr("clip-path", "url(#clip)");
+
+        svg.append("g")
+                .attr("class", "candlestick")
+                .attr("clip-path", "url(#clip)");
+
+  //      svg.append("g")
+  //            .attr("class", "indicator sma ma-0")
+  //              .attr("clip-path", "url(#clip)");
+
+        svg.append("g")
+                .attr("class", "indicator ema ma-1")
+                .attr("clip-path", "url(#clip)");
+
+        svg.append("g")
+                .attr("class", "indicator ema ma-2")
+                .attr("clip-path", "url(#clip)");
+
+        svg.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + height + ")");
+
+        svg.append("g")
+                .attr("class", "y axis")
+                .attr("transform", "translate(" + width + ",0)");
+
+        svg.append("g")
+                .attr("class", "percent axis");
+
+        svg.append("g")
+                .attr("class", "volume axis");
+
+        svg.append("rect")
+                .attr("class", "pane")
+                .attr("width", width)
+                .attr("height", height)
+                .call(zoom);
+
+        d3.csv("http://localhost:8081/RTSI.csv", function (error, data) {
+            var accessor = candlestick.accessor(),
+                indicatorPreRoll = 33;  // Don't show where indicators don't have data
+
+            data = data.map(function (d) {
+            	
+                return {                	
+                    date: parseDate(d.Date),
+                    open: +d.Open,
+                    high: +d.High,
+                    low: +d.Low,
+                    close: +d.Close,
+                    volume: +d.Volume
+                };
+            }).sort(function (a, b) {
+                return d3.ascending(accessor.d(a), accessor.d(b));
+            });
+//             var bisect = d3.bisector(function(d) { return d.date}).left;
+
+//             var tooltipDiv = d3.select("body").append("div")	
+//             .attr("class", "tooltip")				
+//             .style("opacity", 0);
+        
+//         	svg.append('rect').attr('class', 'overlay')
+//           .attr('width', width).attr('height', height)
+//     	    .on("mouseover", function() { 
+//             tooltipDiv.style('opacity', 1);
+//             focus.style("display", null); 
+//           }).on("mouseout", function() { 
+//             tooltipDiv.style('opacity', 0);          
+//             focus.style("display", "none"); 
+//           }).style('fill', 'none').style('pointer-events', 'all').on('mousemove', function() {
+//             var x0 = x.invert(d3.mouse(this)[0]),
+//                 i = bisect(data, x0, 1),
+//                 d0 = data[i-1],
+//                 d1 = data[i],
+//                 d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+            
+//             var text = 'Date: ' + d3.timeFormat('%a %d %b %Y')(d.date);
+//             ['open', 'high', 'low', 'close'].forEach(function(key) {
+//               	text += '<br>' + key + ': ' + d[key];
+//             });
+//             tooltipDiv.style('left', d3.event.pageX+5+'px')
+//             	.style('top', d3.event.pageY-30+'px')
+//             	.html(text.trim());
+            
+//           });
+          // Only want this button to be active if the data has loaded
+//           d3.select("button").on("click", function() { draw(data); }).style("display", "inline");
+          
+            x.domain(techan.scale.plot.time(data, accessor).domain());
+            y.domain(techan.scale.plot.ohlc(data.slice(indicatorPreRoll), accessor).domain());
+            yPercent.domain(techan.scale.plot.percent(y, accessor(data[indicatorPreRoll])).domain());
+            yVolume.domain(techan.scale.plot.volume(data, accessor.v).domain());
+
+            svg.select("g.candlestick").datum(data).call(candlestick);
+            svg.select("g.volume").datum(data).call(volume);
+            svg.select("g.ema.ma-1").datum(techan.indicator.ema().period(shortEma)(data)).call(ema1);
+            svg.select("g.ema.ma-2").datum(techan.indicator.ema().period(longEma)(data)).call(ema2);
+
+            zoomableInit = x.zoomable().domain([indicatorPreRoll, data.length]).copy(); // Zoom in a little to hide indicator preroll
+            yInit = y.copy();
+            yPercentInit = yPercent.copy();
+
+           
+            
+//             draw(data.slice(0, data.length-400));
+               draw()
+        });
+        
+        function convert(d) {
+            return {
+              date: new Date(d.date),
+             value: +d.value,  
+             open: +d3.format(".6f"),
+             high: +d3.format(".6f"),
+             low: +d3.format(".6f"),
+             close: +d3.format(".6f")                     // convert string to number
+            };
+        }
+
+        function reset() {
+            zoom.scale(1);
+            zoom.translate([0, 0]);
+            draw();
+        }
+
+        function zoomed() {
+            x.zoomable().domain(d3.event.transform.rescaleX(zoomableInit).domain());
+            y.domain(d3.event.transform.rescaleY(yInit).domain());
+            yPercent.domain(d3.event.transform.rescaleY(yPercentInit).domain());
+
+            draw();
+        }
+
+        function draw() {
+        	
+            svg.select("g.x.axis").call(xAxis);
+            svg.select("g.y.axis").call(yAxis);
+            svg.select("g.volume.axis").call(volumeAxis);
+            svg.select("g.percent.axis").call(percentAxis);
+
+            // We know the data does not change, a simple refresh that does not perform data joins will suffice.
+            svg.select("g.candlestick").call(candlestick.refresh);
+            svg.select("g.volume").call(volume.refresh);
+            svg.select("g.ema.ma-1").call(ema1.refresh);
+            svg.select("g.ema.ma-2").call(ema2.refresh);
+        }
+    }
+
+    chart("EURUSD_H1", "EURUSD_H1", 1200, 800);
+    </script>
+</body>
+</html>
