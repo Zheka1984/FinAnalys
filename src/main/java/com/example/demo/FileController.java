@@ -15,17 +15,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class FileController {
 	@GetMapping("/{fileName}")
-	public ResponseEntity<ByteArrayResource> getCsvFile(@PathVariable(value = "fileName") String fileName) throws IOException {
-		File file = new File("C:\\Users\\Админ\\eclipse-workspace\\demo\\src\\main\\resources\\"+fileName);
+	public ResponseEntity<ByteArrayResource> getCsvFile(@PathVariable(value = "fileName") String fileName)
+			throws IOException {
+		File file = new File("C:\\Users\\Админ\\eclipse-workspace\\demo\\src\\main\\resources\\" + fileName);
 		byte[] arr = Files.readAllBytes(file.toPath());
 		ByteArrayResource resource = new ByteArrayResource(arr);
 //		MediaType mediaType = new MediaType();
-		return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" 
-                        + fileName) 
+		return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + fileName)
 //              .contentType(mediaType) //
 //              // Content-Lengh
 //              .contentLength(data.length) //
-              .body(resource);
+				.body(resource);
 	}
 }
