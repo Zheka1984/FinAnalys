@@ -1,6 +1,5 @@
 package com.example.demo;
 
-import org.ta4j.core.BaseBarSeriesBuilder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
