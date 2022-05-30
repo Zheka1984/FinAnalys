@@ -134,7 +134,7 @@ public class TechAnalyz {
 				time = LocalTime.of(0, 0);
 			} else
 				time = LocalTime.parse(arr[1]);
-			zdt = ZonedDateTime.of(LocalDate.parse(arr[0], DateTimeFormatter.ofPattern("d-L-u")), time,
+			zdt = ZonedDateTime.of(LocalDate.parse(arr[0], DateTimeFormatter.ofPattern("u-L-d")), time,
 					ZoneId.of("GMT+0"));
 //		 System.out.println(zdt.toString());
 			return zdt;

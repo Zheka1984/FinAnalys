@@ -13,7 +13,7 @@ let func = function(e, form) {
         method: "post", 
         body: new FormData(form)
     }).then(result => 
-    		d3.csv("http://localhost:8081/RTSI.csv", function (error, data) {
+    		d3.csv("http://localhost:8081/listPoz.csv", function (error, data) {
                 
                 let arr = data.map(function (d) {
                 	

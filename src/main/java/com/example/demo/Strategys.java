@@ -32,15 +32,10 @@ import org.ta4j.core.rules.*;
 
 import com.opencsv.CSVWriter;
 
-import javax.swing.*;
-import javax.swing.plaf.ColorUIResource;
-import javax.swing.plaf.metal.DefaultMetalTheme;
-import javax.swing.plaf.metal.MetalLookAndFeel;
-import java.awt.*;
 import java.time.ZonedDateTime;
 
 public class Strategys {
-	String aktiv = "RTSI";
+	String aktiv = "EURUSD-copy";
 	BarSeries series = TechAnalyz.loadBitstampSeries(aktiv);
 	Strategy strategy = null;
 	TradingRecord tradingRecord = null;
@@ -123,7 +118,6 @@ public class Strategys {
 		Rule rule = null;
 		Indicator indicator1 = null;
 		Indicator indicator2 = null;
-		rule.and(rule);
 		switch (strategy.getIndicator1()) {
 		case ("Exponential Moving Average"):
 			indicator1 = new EMAIndicator(closePrice, strategy.getPeriod1());
@@ -176,9 +170,12 @@ public class Strategys {
 	}
 
 	public void perfomAndWriteResult(Strategy bstr) throws IOException {
+		System.out.println(bstr);
 		List<Position> listPoz = null;
 		tradingRecord = seriesManager.run(bstr);
+		System.out.println(seriesManager.getBarSeries().getBarCount());
 		listPoz = tradingRecord.getPositions();
+		System.out.println("strategy : "+ tradingRecord.getPositionCount());
 		writeResultToCSV(listPoz);
 	}
 
@@ -215,8 +212,9 @@ public class Strategys {
 
 	// формирование строки с временем (в формате %d-%m-%y), типом сделки, ценой и
 	// количеством
-//	для записи в массив
+    //	для записи в массив
 	public static String[] lineForArray(ZonedDateTime zdtime, Trade trade) {
+		System.out.println("trade "+trade.getAmount());
 		String time = changeDate(zdtime.getDayOfMonth()) + "-" + changeDate(zdtime.getMonthValue()) + "-"
 				+ changeYear(zdtime.getYear());
 		String type = trade.getType().toString();
@@ -226,7 +224,8 @@ public class Strategys {
 	}
 
 	public void writeResultToCSV(List<Position> listPoz) throws IOException {
-		Path path = Paths.get("C:\\Users\\Админ\\eclipse-workspace\\demo\\src\\main\\resources\\listPoz.csv");
+		System.out.println("длина массива "+listPoz.size());
+		Path path = Paths.get("listPoz.csv");
 		List<String[]> ar = new ArrayList<>();
 		ar.add(new String[] { "time", "type", "price", "quantity" });
 		CSVWriter writer = new CSVWriter(new FileWriter(path.toString()));

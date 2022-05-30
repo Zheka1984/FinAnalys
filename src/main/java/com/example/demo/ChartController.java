@@ -28,7 +28,7 @@ public class ChartController {
 	ListWrapper listwrapper = new ListWrapper();
 	Strategys strat;
 
-	@GetMapping("/ema")
+	@GetMapping("/ema") //вывод индикатор на график
 	public String drawEma(Model model) {
 		int shortEma = 10;
 		int longEma = 50;
@@ -55,12 +55,13 @@ public class ChartController {
 		// сделать проверку на null и вывод результата на страницу
 		System.out.println("startcont");
 		model.addAttribute("listwrapper", listwrapper);
-		Thread.sleep(5000);
+		
 		// если длины массивов равны, т.е кол-во условый для входа и выхода равны
 		if (listwrapper.getList1().size() == listwrapper.getList2().size()) {
 			for (int i = 0; i < listwrapper.getList1().size(); i++) {
 				listwrapper.getList2().get(i).setPeriod1(listwrapper.getList1().get(i).getPeriod1());
 				listwrapper.getList2().get(i).setPeriod2(listwrapper.getList1().get(i).getPeriod2());
+				System.out.println("wrappersize "+listwrapper.getList2().get(i).getIndicator2());
 			}
 		}
 		// если длина второго массива больше, периоды переменных во втором будут равны
@@ -92,7 +93,7 @@ public class ChartController {
 		mav.setStatus(HttpStatus.OK);
 		mav.setViewName("testingResult");
 		mav.addObject("response", "success");
-		System.out.println("end");
+		System.out.println("strrr "+strat.workingStrategy(listwrapper).getExitRule().toString());
 		return mav;
 //    	return new ResponseEntity<>("Hello World!", HttpStatus.OK); 
 	}
