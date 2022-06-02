@@ -31,11 +31,16 @@ let func = function(e, form) {
                     };
                 });
                 console.log(arr[0]);
-                Object.values(arr).forEach(data => {temp = document.createElement('table').insertRow();
-                for(var t in Object.values(data)) console.log(t);
+                Object.values(arr).forEach(data => {temp = document.createElement('table').insertRow(); 
                 temp.className = 'results';
-                temp.innerHTML = Object.values(data);
+                for(var t in Object.values(data)) {
+                var cell = temp.insertCell(-1);
+                
+                cell.innerHTML = Object.values(data)[t];
                 document.getElementsByTagName('body')[0].appendChild(temp);
+                }
+                
+                
 				}
 				);
 			}
