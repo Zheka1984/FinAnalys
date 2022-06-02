@@ -17,7 +17,7 @@ public class FileController {
 	@GetMapping("/{fileName}")
 	public ResponseEntity<ByteArrayResource> getCsvFile(@PathVariable(value = "fileName") String fileName)
 			throws IOException {
-		File file = new File("C:\\Users\\Админ\\eclipse-workspace\\FinAnalys\\src\\main\\resources\\" + fileName);
+		File file = new File("C:\\Users\\Админ\\eclipse-workspace\\FinAnalys\\" + fileName);
 		byte[] arr = Files.readAllBytes(file.toPath());
 		ByteArrayResource resource = new ByteArrayResource(arr);
 //		MediaType mediaType = new MediaType();

@@ -120,6 +120,7 @@ public class Strategys {
 		Indicator indicator2 = null;
 		switch (strategy.getIndicator1()) {
 		case ("Exponential Moving Average"):
+			System.out.println("expmovaver");
 			indicator1 = new EMAIndicator(closePrice, strategy.getPeriod1());
 			break;
 		case ("MACD"):
@@ -128,7 +129,8 @@ public class Strategys {
 		}
 		switch (strategy.getIndicator2()) {
 		case ("Exponential Moving Average"):
-			indicator2 = new EMAIndicator(closePrice, strategy.getPeriod1());
+			System.out.println("expmovaver");
+			indicator2 = new EMAIndicator(closePrice, strategy.getPeriod2());
 			break;
 		case ("MACD"):
 			indicator2 = new MACDIndicator(closePrice, strategy.getPeriod1(), strategy.getPeriod2());
@@ -146,9 +148,11 @@ public class Strategys {
 			rule = new IsEqualRule(indicator1, indicator2);
 			break;
 		case ("OverIndicatorRule"):
+			System.out.println("indicator rule");
 			rule = new OverIndicatorRule(indicator1, indicator2);
 			break;
 		case ("UnderIndicatorRule"):
+			System.out.println("indicator rule");
 			rule = new UnderIndicatorRule(indicator1, indicator2);
 			break;
 		}

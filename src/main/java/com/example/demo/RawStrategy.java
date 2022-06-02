@@ -43,7 +43,7 @@ public class RawStrategy {
 	}
 
 	public RawStrategy() {
-		super();
+	
 	}
 
 	public String getIndicator1() {

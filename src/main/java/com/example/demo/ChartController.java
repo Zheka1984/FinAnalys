@@ -61,7 +61,7 @@ public class ChartController {
 			for (int i = 0; i < listwrapper.getList1().size(); i++) {
 				listwrapper.getList2().get(i).setPeriod1(listwrapper.getList1().get(i).getPeriod1());
 				listwrapper.getList2().get(i).setPeriod2(listwrapper.getList1().get(i).getPeriod2());
-				System.out.println("wrappersize "+listwrapper.getList2().get(i).getIndicator2());
+				System.out.println("wrappersize "+listwrapper.getList2().get(i).getPeriod2());
 			}
 		}
 		// если длина второго массива больше, периоды переменных во втором будут равны

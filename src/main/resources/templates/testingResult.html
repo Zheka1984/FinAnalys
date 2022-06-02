@@ -3,12 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
+<style>
+  .results { border-collapse: collapse; width:300px; }
+  .results { padding: 5px; border: solid 1px #777; }
+  .results { background-color: lightblue; }
+</style>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script src="http://techanjs.org/techan.min.js"></script>
 <script th:inline="javascript">
 let func = function(e, form) {
     e.preventDefault();
     var parseDate = d3.timeParse("%d-%m-%y"); 
+    var timeFormat = d3.timeFormat("%d-%m-%y");
      fetch('/testing', {
         method: "post", 
         body: new FormData(form)
@@ -18,15 +24,17 @@ let func = function(e, form) {
                 let arr = data.map(function (d) {
                 	
                     return {                	
-                        time: parseDate(d.time),
-                        type: +d.type,
+                        time: timeFormat(parseDate(d.time)),
+                        type: d.type,
                         price: +d.price,
                         quantity: +d.quantity,                       
                     };
                 });
-                Object.values(arr).forEach(data => {temp = document.createElement('div');
+                console.log(arr[0]);
+                Object.values(arr).forEach(data => {temp = document.createElement('table').insertRow();
+                for(var t in Object.values(data)) console.log(t);
                 temp.className = 'results';
-                temp.innerHTML = data;
+                temp.innerHTML = Object.values(data);
                 document.getElementsByTagName('body')[0].appendChild(temp);
 				}
 				);
