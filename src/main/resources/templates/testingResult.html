@@ -54,7 +54,8 @@ let func = function(e, form) {
 <p>Введите две переменные и условие входа</p>
 <form id="the-form" action="#" th:action="@{/testing}" th:object="${listwrapper}" method="post">
 <table>
-<button type="submit" name="addRow1" th:text="#{добавить строку}">Add row</button>
+<button type="submit" name="addRow1" >Add row</button>
+<button type="submit" name="deleteRow1" >Delete row</button>
 <tr th:each="rawStrategy, itemStat : ${listwrapper.list1}">
      <!-- <td><input th:field="*{list[__${itemStat.index}__].indicator1}" /></td>
      <td><input th:field="*{list[__${itemStat.index}__].indicator2}" /></td> -->
@@ -82,7 +83,8 @@ let func = function(e, form) {
 </table>
 <p>Введите две переменные и условие выхода</p>
 <table>
-<button type="submit" name="addRow2" th:text="#{добавить строку}">Add row</button>
+<button type="submit" name="addRow2" >Add row</button>
+<button type="submit" name="deleteRow2" >Delete row</button>
 <tr th:each="rawStrategy, itemStat : ${listwrapper.list2}">
      <!-- <td><input th:field="*{list[__${itemStat.index}__].indicator1}" /></td>
      <td><input th:field="*{list[__${itemStat.index}__].indicator2}" /></td> -->
@@ -108,6 +110,10 @@ let func = function(e, form) {
 </table>
  <button onclick="func(event, form)">Click me</button> 
 </form>
+<form method="get" action="/ema">
+<input type="submit" value="открыть график">
+</form>
+
 </body>
 
 </html>

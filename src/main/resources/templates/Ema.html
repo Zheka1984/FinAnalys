@@ -59,7 +59,15 @@
     }
 
     .ma-2 path.line {
+        stroke: #0e2aff;
+    }
+    
+    .ma-3 path.line {
         stroke: #ff7f0e;
+    }
+    
+    .ma-4 path.line {
+        stroke: #8bb863;
     }
 
     button {
@@ -83,8 +91,10 @@
 
 </style>
 <script>
-    var shortEma = [[${shortEma}]];
-    var longEma = [[${longEma}]];
+    var shortEma1 = [[${shortEma1}]];
+    var longEma1 = [[${longEma1}]];
+    var shortEma2 = [[${shortEma2}]];
+    var longEma2 = [[${longEma2}]];
 </script>
 </head>
 <body>
@@ -128,6 +138,14 @@
         var ema2 = techan.plot.ema()
                 .xScale(x)
                 .yScale(y);
+        
+        var ema3 = techan.plot.ema()
+                .xScale(x)
+                .yScale(y);
+        
+        var ema4 = techan.plot.ema()
+                 .xScale(x)
+                 .yScale(y);
 
         var volume = techan.plot.volume()
                 .accessor(candlestick.accessor())   // Set the accessor to a ohlc accessor so we get highlighted bars
@@ -187,6 +205,14 @@
         svg.append("g")
                 .attr("class", "indicator ema ma-2")
                 .attr("clip-path", "url(#clip)");
+        
+        svg.append("g")
+        .attr("class", "indicator ema ma-3")
+        .attr("clip-path", "url(#clip)");
+
+        svg.append("g")
+        .attr("class", "indicator ema ma-4")
+        .attr("clip-path", "url(#clip)");
 
         svg.append("g")
                 .attr("class", "x axis")
@@ -265,8 +291,11 @@
 
             svg.select("g.candlestick").datum(data).call(candlestick);
             svg.select("g.volume").datum(data).call(volume);
-            svg.select("g.ema.ma-1").datum(techan.indicator.ema().period(shortEma)(data)).call(ema1);
-            svg.select("g.ema.ma-2").datum(techan.indicator.ema().period(longEma)(data)).call(ema2);
+            svg.select("g.ema.ma-1").datum(techan.indicator.ema().period(shortEma1)(data)).call(ema1);
+            svg.select("g.ema.ma-2").datum(techan.indicator.ema().period(longEma1)(data)).call(ema2);
+            svg.select("g.ema.ma-3").datum(techan.indicator.ema().period(shortEma2)(data)).call(ema3);
+            svg.select("g.ema.ma-4").datum(techan.indicator.ema().period(longEma2)(data)).call(ema4);
+            
 
             zoomableInit = x.zoomable().domain([indicatorPreRoll, data.length]).copy(); // Zoom in a little to hide indicator preroll
             yInit = y.copy();
@@ -315,6 +344,8 @@
             svg.select("g.volume").call(volume.refresh);
             svg.select("g.ema.ma-1").call(ema1.refresh);
             svg.select("g.ema.ma-2").call(ema2.refresh);
+            svg.select("g.ema.ma-3").call(ema3.refresh);
+            svg.select("g.ema.ma-4").call(ema4.refresh);
         }
     }
 

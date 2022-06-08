@@ -28,12 +28,25 @@ public class ChartController {
 	ListWrapper listwrapper = new ListWrapper();
 	Strategys strat;
 
-	@GetMapping("/ema") //вывод индикатор на график
+	@GetMapping("/ema") //вывод индикаторов на график, поддерживаются одна или две пары индикаторов
 	public String drawEma(Model model) {
-		int shortEma = 10;
-		int longEma = 50;
-		model.addAttribute("shortEma", shortEma);
-		model.addAttribute("longEma", longEma);
+		int shortEma1=0;
+		int longEma1=0;
+		int shortEma2=0;
+		int longEma2=0;
+		if(listwrapper.getList1().get(0) != null) {
+		shortEma1 = listwrapper.getList1().get(0).getPeriod1();
+		longEma1 = listwrapper.getList1().get(0).getPeriod2();
+		}
+		if(listwrapper.getList1().size()>1) {
+			shortEma2 = listwrapper.getList1().get(1).getPeriod1();
+			longEma2 = listwrapper.getList1().get(1).getPeriod2();
+			}
+		System.out.println(shortEma1+" "+longEma1+" "+shortEma2+" "+longEma2);
+		model.addAttribute("shortEma1", shortEma1);
+		model.addAttribute("longEma1", longEma1);
+		model.addAttribute("shortEma2", shortEma2);
+		model.addAttribute("longEma2", longEma2);
 		return "Ema";
 	}
 
@@ -55,7 +68,7 @@ public class ChartController {
 		// сделать проверку на null и вывод результата на страницу
 		System.out.println("startcont");
 		model.addAttribute("listwrapper", listwrapper);
-		
+		this.listwrapper = listwrapper;
 		// если длины массивов равны, т.е кол-во условый для входа и выхода равны
 		if (listwrapper.getList1().size() == listwrapper.getList2().size()) {
 			for (int i = 0; i < listwrapper.getList1().size(); i++) {
@@ -102,6 +115,7 @@ public class ChartController {
 	public String addRow1(Model model) {
 		System.out.println("start");
 		System.out.println("size1 " + listwrapper.getList1().size());
+		if(listwrapper.getList1().size()<2) 
 		listwrapper.getList1().add(new RawStrategy());
 		model.addAttribute("listwrapper", listwrapper);
 		System.out.println("end");
@@ -112,10 +126,31 @@ public class ChartController {
 	public String addRow2(Model model) {
 		System.out.println("start");
 		System.out.println("size2 " + listwrapper.getList2().size());
+		if(listwrapper.getList2().size()<2) 
 		listwrapper.getList2().add(new RawStrategy());
 		model.addAttribute("listwrapper", listwrapper);
 		System.out.println("end");
-		model.addAttribute("response", "ok");
+		
+		return "testingResult";
+	}
+	
+	@PostMapping(value = "/testing", params = { "deleteRow1" })
+	public String deleteRow1(Model model) {
+		System.out.println("start");
+		System.out.println("size1 " + listwrapper.getList1().size());
+		listwrapper.getList1().remove(0);
+		model.addAttribute("listwrapper", listwrapper);
+		System.out.println("end");
+		return "testingResult";
+	}
+	
+	@PostMapping(value = "/testing", params = { "deleteRow2" })
+	public String deleteRow2(Model model) {
+		System.out.println("start");
+		System.out.println("size1 " + listwrapper.getList1().size());
+		listwrapper.getList2().remove(0);
+		model.addAttribute("listwrapper", listwrapper);
+		System.out.println("end");
 		return "testingResult";
 	}
 }
